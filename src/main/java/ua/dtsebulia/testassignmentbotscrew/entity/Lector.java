@@ -33,4 +33,8 @@ public class Lector {
 
     @OneToMany(mappedBy = "headOfDepartment")
     private Set<Department> departments;
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }
