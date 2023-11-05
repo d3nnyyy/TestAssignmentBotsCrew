@@ -6,7 +6,10 @@ import ua.dtsebulia.testassignmentbotscrew.entity.Department;
 import ua.dtsebulia.testassignmentbotscrew.entity.Lector;
 import ua.dtsebulia.testassignmentbotscrew.repository.DepartmentRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,21 +70,28 @@ public class DepartmentService {
     }
 
     public String globalSearch(String template) {
+
+        List<String> results = new ArrayList<>();
+
         List<Department> departments = departmentRepository.findAll();
-        List<Lector> lectors = departments.stream()
+
+        departments.forEach(department -> {
+            if (department.getName().contains(template)) {
+                results.add(department.getName());
+            }
+        });
+
+        Set<Lector> lectors = departments.stream()
                 .flatMap(department -> department.getLectors().stream())
-                .toList();
+                .collect(Collectors.toSet());
 
-        List<Department> departmentMatches = departments.stream()
-                .filter(department -> department.getName().contains(template))
-                .toList();
+        lectors.forEach(lector -> {
+            if (lector.getFullName().contains(template)) {
+                results.add(lector.getFullName());
+            }
+        });
 
-        List<Lector> lectorMatches = lectors.stream()
-                .filter(lector -> lector.getFullName().contains(template))
-                .toList();
-
-        return "Departments found: " + departmentMatches.size() + ".\n" +
-                "Lectors found: " + lectorMatches.size() + ".";
+        return String.join(",", results);
     }
 
     private Department getDepartmentByName(String departmentName) {
