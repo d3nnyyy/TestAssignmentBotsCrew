@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -38,13 +39,15 @@ public class DepartmentService {
         Department department = getDepartmentByName(departmentName);
 
         if (department != null) {
-            long assistantCount = countLectorsByDegree(department, "assistant");
-            long associateProfessorCount = countLectorsByDegree(department, "associate professor");
-            long professorCount = countLectorsByDegree(department, "professor");
-
-            return "assistants - " + assistantCount + ".\n" +
-                    "associate professors - " + associateProfessorCount + ".\n" +
-                    "professors - " + professorCount + ".";
+            if (department.getLectors() != null && !department.getLectors().isEmpty()) {
+                long assistantCount = countLectorsByDegree(department, "assistant");
+                long associateProfessorCount = countLectorsByDegree(department, "associate professor");
+                long professorCount = countLectorsByDegree(department, "professor");
+                return "assistants - " + assistantCount + ".\n" +
+                        "associate professors - " + associateProfessorCount + ".\n" +
+                        "professors - " + professorCount + ".";
+            }
+            return "Department " + departmentName + " has no lectors.";
         }
         return String.format(NOT_FOUND_MESSAGE, departmentName);
     }
@@ -53,8 +56,11 @@ public class DepartmentService {
         Department department = getDepartmentByName(departmentName);
 
         if (department != null) {
-            double averageSalary = calculateAverageSalary(department);
-            return "The average salary of " + departmentName + " is " + averageSalary + ".";
+            if (department.getLectors() != null && !department.getLectors().isEmpty()) {
+                double averageSalary = calculateAverageSalary(department);
+                return "The average salary of " + departmentName + " is " + averageSalary + ".";
+            }
+            return "Department " + departmentName + " has no lectors.";
         }
         return String.format(NOT_FOUND_MESSAGE, departmentName);
     }
@@ -63,8 +69,11 @@ public class DepartmentService {
         Department department = getDepartmentByName(departmentName);
 
         if (department != null) {
-            int employeeCount = department.getLectors().size();
-            return "Employee count of " + departmentName + " is " + employeeCount + ".";
+            if (department.getLectors() != null && !department.getLectors().isEmpty()) {
+                int employeeCount = department.getLectors().size();
+                return "Employee count of " + departmentName + " is " + employeeCount + ".";
+            }
+            return "Department " + departmentName + " has no lectors.";
         }
         return String.format(NOT_FOUND_MESSAGE, departmentName);
     }
@@ -82,8 +91,7 @@ public class DepartmentService {
         });
 
         Set<Lector> lectors = departments.stream()
-                .flatMap(department -> department.getLectors().stream())
-                .collect(Collectors.toSet());
+                .flatMap(department -> department.getLectors() == null ? Stream.empty() : department.getLectors().stream()).collect(Collectors.toSet());
 
         lectors.forEach(lector -> {
             if (lector.getFullName().contains(template)) {
@@ -105,9 +113,15 @@ public class DepartmentService {
     }
 
     private double calculateAverageSalary(Department department) {
-        return department.getLectors().stream()
-                .mapToInt(Lector::getSalary)
-                .average()
-                .orElse(0.0);
+        Set<Lector> lecturers = department.getLectors();
+        if (lecturers != null && !lecturers.isEmpty()) {
+            return lecturers.stream()
+                    .mapToInt(lector -> lector.getSalary() != null ? lector.getSalary() : 0)
+                    .average()
+                    .orElse(0);
+        } else {
+            return 0.0;
+        }
     }
+
 }
