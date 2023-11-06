@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Entity class for degrees.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

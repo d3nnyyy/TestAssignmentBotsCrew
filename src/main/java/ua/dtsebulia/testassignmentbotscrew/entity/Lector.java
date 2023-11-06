@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-
+/**
+ * Entity class for lectors.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
