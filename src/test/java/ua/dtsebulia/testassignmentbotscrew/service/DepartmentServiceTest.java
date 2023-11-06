@@ -203,4 +203,46 @@ class DepartmentServiceTest {
         assertEquals("The average salary of Test Department is 0.0.", result);
     }
 
+    @Test
+    void testGetEmployeeCount() {
+
+        Lector lector1 = Lector.builder().firstName("John").lastName("Doe").build();
+        Lector lector2 = Lector.builder().firstName("Jane").lastName("Doe").build();
+        Lector lector3 = Lector.builder().firstName("Jack").lastName("Doe").build();
+
+        Department department = Department
+                .builder()
+                .name("Test Department")
+                .lectors(Set.of(lector1, lector2, lector3))
+                .build();
+
+        when(departmentRepository.findByName("Test Department")).thenReturn(department);
+
+        String result = departmentService.getEmployeeCount("Test Department");
+        assertEquals("Employee count of Test Department is 3.", result);
+    }
+
+    @Test
+    void testGetEmployeeCountWhenDepartmentNotFound() {
+
+        when(departmentRepository.findByName("Test Department")).thenReturn(null);
+
+        String result = departmentService.getEmployeeCount("Test Department");
+        assertEquals("Department with name Test Department not found.", result);
+    }
+
+    @Test
+    void testGetEmployeeCountWhenNoLectors() {
+
+        Department department = Department
+                .builder()
+                .name("Test Department")
+                .build();
+
+        when(departmentRepository.findByName("Test Department")).thenReturn(department);
+
+        String result = departmentService.getEmployeeCount("Test Department");
+        assertEquals("Department Test Department has no lectors.", result);
+    }
+
 }
