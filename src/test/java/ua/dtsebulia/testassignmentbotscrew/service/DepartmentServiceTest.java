@@ -141,4 +141,66 @@ class DepartmentServiceTest {
         assertEquals("Department Test Department has no lectors.", result);
     }
 
+    @Test
+    void testGetAverageSalaryForDepartment() {
+
+        Lector lector1 = Lector.builder().salary(50000).build();
+        Lector lector2 = Lector.builder().salary(70000).build();
+        Lector lector3 = Lector.builder().salary(60000).build();
+
+        Department department = Department
+                .builder()
+                .name("Test Department")
+                .lectors(Set.of(lector1, lector2, lector3))
+                .build();
+
+
+        when(departmentRepository.findByName("Test Department")).thenReturn(department);
+
+        String result = departmentService.getAverageSalaryForDepartment("Test Department");
+        assertEquals("The average salary of Test Department is 60000.0.", result);
+    }
+
+    @Test
+    void testGetAverageSalaryForDepartmentWhenDepartmentNotFound() {
+
+        when(departmentRepository.findByName("Test Department")).thenReturn(null);
+
+        String result = departmentService.getAverageSalaryForDepartment("Test Department");
+        assertEquals("Department with name Test Department not found.", result);
+    }
+
+    @Test
+    void testGetAverageSalaryForDepartmentWhenNoLectors() {
+
+        Department department = Department
+                .builder()
+                .name("Test Department")
+                .build();
+
+        when(departmentRepository.findByName("Test Department")).thenReturn(department);
+
+        String result = departmentService.getAverageSalaryForDepartment("Test Department");
+        assertEquals("Department Test Department has no lectors.", result);
+    }
+
+    @Test
+    void testGetAverageSalaryForDepartmentWhenLectorsHaveNoSalary() {
+
+        Lector lector1 = Lector.builder().firstName("John").lastName("Doe").build();
+        Lector lector2 = Lector.builder().firstName("Jane").lastName("Doe").build();
+        Lector lector3 = Lector.builder().firstName("Jack").lastName("Doe").build();
+
+        Department department = Department
+                .builder()
+                .name("Test Department")
+                .lectors(Set.of(lector1, lector2, lector3))
+                .build();
+
+        when(departmentRepository.findByName("Test Department")).thenReturn(department);
+
+        String result = departmentService.getAverageSalaryForDepartment("Test Department");
+        assertEquals("The average salary of Test Department is 0.0.", result);
+    }
+
 }
