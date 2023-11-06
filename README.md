@@ -10,7 +10,7 @@ This is a simple Spring Boot Java project with a console interface for managing 
 - [Usage](#usage)
   - [Available Commands](#available-commands)
   - [Examples](#examples)
-  - [Tests](#tests)
+- [Tests](#tests)
 
 ## Getting Started
 
