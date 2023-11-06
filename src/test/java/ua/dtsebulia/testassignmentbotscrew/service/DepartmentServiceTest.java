@@ -245,4 +245,64 @@ class DepartmentServiceTest {
         assertEquals("Department Test Department has no lectors.", result);
     }
 
+    @Test
+    void testGlobalSearchWhereDepartmentsContainTemplate() {
+
+        Department department1 = Department.builder().name("Test Department 1").build();
+        Department department2 = Department.builder().name("Test Department 2").build();
+        Department department3 = Department.builder().name("Test Department 3").build();
+
+        when(departmentRepository.findAll()).thenReturn(List.of(department1, department2, department3));
+
+        String result = departmentService.globalSearch("Department");
+        assertEquals("Test Department 1,Test Department 2,Test Department 3", result);
+    }
+
+    @Test
+    void testGlobalSearchWhereLectorsContainTemplate() {
+
+        Lector lector1 = Lector.builder().firstName("John").lastName("Doe").build();
+        Lector lector2 = Lector.builder().firstName("Jane").lastName("Doe").build();
+        Lector lector3 = Lector.builder().firstName("Doe").lastName("Jack").build();
+
+        Department department = Department.builder().name("Test Department").lectors(Set.of(lector1, lector2, lector3)).build();
+
+        when(departmentRepository.findAll()).thenReturn(List.of(department));
+
+        String result = departmentService.globalSearch("Doe");
+        assertEquals("John Doe,Jane Doe,Doe Jack", result);
+    }
+
+    @Test
+    void testGlobalSearchWhereDepartmentsAndLectorsContainTemplate() {
+
+        Department department = Department.builder().name("Test Department").build();
+
+        Lector lector1 = Lector.builder().firstName("FirstName").lastName("Test").build();
+        Lector lector2 = Lector.builder().firstName("Test").lastName("LastName").build();
+
+        department.setLectors(Set.of(lector1, lector2));
+
+        when(departmentRepository.findAll()).thenReturn(List.of(department));
+
+        String result = departmentService.globalSearch("Test");
+        assertEquals("Test Department,FirstName Test,Test LastName", result);
+    }
+
+    @Test
+    void testGlobalSearchWhenNoResults() {
+
+        Department department = Department.builder().name("Test Department").build();
+
+        Lector lector1 = Lector.builder().firstName("John").lastName("Doe").build();
+        Lector lector2 = Lector.builder().firstName("Jane").lastName("Doe").build();
+
+        department.setLectors(Set.of(lector1, lector2));
+
+        when(departmentRepository.findAll()).thenReturn(List.of(department));
+
+        String result = departmentService.globalSearch("No Results");
+        assertEquals("", result);
+    }
+
 }
